@@ -5,7 +5,7 @@ import random
 help_message="!rank [0123] 查看群内各模式菜鸡排名\n" \
              "!capp 查询单图pp\n" \
              "!roll 1-100随机roll点\n" \
-             "!sleep [n] 让bot口球你n秒"
+             "!sleep [n] 让bot口球你n分钟"
 
 def onQQMessage(bot, contact, member, content):
     if contact.ctype=='group' and (contact.qq=='203341856' or contact.qq=='200064826'):
@@ -34,11 +34,11 @@ def onQQMessage(bot, contact, member, content):
             elif command.startswith("help"):
                 bot.SendTo(contact, help_message)
             elif command.startswith("sleep"):
-                second = int(content[7:])
+                min = int(content[7:])
                 gl = bot.List('group', contact.name)
                 if gl:
                     group = gl[0]
                     membs = bot.List(group, member.name)
                     if membs:
-                        bot.GroupShut(group, membs, second)
+                        bot.GroupShut(group, membs, min*60)
 
