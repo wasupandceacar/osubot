@@ -1,15 +1,14 @@
 import requests
 import json
 import threading
-
-uids=['6556530','2235055','4913032','4992384','3235216','10220947','6764344','7294836','9249730','9858848','9464263','10210497','8112499','10989054','7445385','4320508']
+from db_collections import get_group_uids
 
 s = requests.Session()
 
 rank_dic={}
 
 def get_rank(mod):
-    threads = [threading.Thread(target=get_one_rank, args=(uid, mod)) for uid in uids]
+    threads = [threading.Thread(target=get_one_rank, args=(uid, mod)) for uid in get_group_uids()]
     for t in threads:
         t.start()
     for t in threads:
