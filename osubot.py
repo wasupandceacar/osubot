@@ -23,6 +23,10 @@ def check_bp_task(bot):
                 for group in gl:
                     bot.SendTo(group, r)
 
+def onStartupComplete(bot):
+    refresh_group_bp()
+    print("初始强制刷新完成")
+
 def onQQMessage(bot, contact, member, content):
     if contact.ctype=='group' and (contact.qq=='203341856' or contact.qq=='200064826'):
         if content.startswith('!'):
