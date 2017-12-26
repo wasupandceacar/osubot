@@ -53,14 +53,15 @@ def get_username(uid):
     data = s.get(userurl).content
     user = data.decode('utf-8')
     userlist = re.compile('<title>(.*?)\'s profile', re.S)
-    return re.findall(userlist, user)[0]
+    try:
+        return re.findall(userlist, user)[0]
+    except:
+        print(str(uid)+" crashed")
+        return get_username(uid)
 
 def refresh_group_bp():
-    threads = [threading.Thread(target=get_one_bp, args=(uid, )) for uid in get_group_uids()]
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
+    for uid in get_group_uids():
+        get_one_bp(uid)
     try:
         db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
         cursor = db.cursor()
@@ -92,11 +93,8 @@ def get_group_bps():
         traceback.print_exc()
 
 def diff_group_bps():
-    threads = [threading.Thread(target=get_one_bp, args=(uid, )) for uid in get_group_uids()]
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
+    for uid in get_group_uids():
+        get_one_bp(uid)
     old_bp_dic=get_group_bps()
     re=[]
     for i in range(len(bp_dic)):
@@ -108,7 +106,7 @@ def diff_group_bps():
                     re.append("("+mod[i]+") "+v[0]+" 刷新了bp1\n"+v[2]+" "+v[1]+"pp")
                     db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
                     cursor = db.cursor()
-                    sql = "UPDATE group_bps SET username='%s', bpname='%s', bppp='%d' where uid='%d' and mode='%d'" % (v[0], v[2], int(v[1]), k, i)
+                    sql = """UPDATE group_bps SET username="%s", bpname="%s", bppp="%d" where uid="%d" and mode="%d" """ % (v[0], v[2], int(v[1]), k, i)
                     cursor.execute(sql)
                     db.commit()
                     db.close()
@@ -117,4 +115,4 @@ def diff_group_bps():
     return re
 
 if __name__ == "__main__":
-   print(diff_group_bps())
+    print(diff_group_bps())

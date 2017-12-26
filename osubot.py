@@ -1,11 +1,27 @@
 from group_rank import *
 from caculate_pp import *
+from db_collections import *
 import random
+from qqbot import qqbotsched
 
 help_message="!rank [0123] 查看群内各模式菜鸡排名\n" \
              "!capp 查询单图pp\n" \
              "!roll 1-100随机roll点\n" \
-             "!sleep [n] 让bot口球你n分钟"
+             "!sleep [n] 让bot口球你n分钟\n" \
+             "!refresh 手动刷新群内bp1，并报告bp1更新结果\n" \
+             "!su refresh 强制完全刷新bp1，不报告结果"
+
+@qqbotsched(minute='*/10')
+def check_bp_task(bot):
+    re = diff_group_bps()
+    if len(re) == 0:
+        print("无bp1更新")
+    else:
+        for r in re:
+            gl = bot.List('group', '200064826')
+            if gl is not None:
+                for group in gl:
+                    bot.SendTo(group, r)
 
 def onQQMessage(bot, contact, member, content):
     if contact.ctype=='group' and (contact.qq=='203341856' or contact.qq=='200064826'):
@@ -41,4 +57,19 @@ def onQQMessage(bot, contact, member, content):
                     membs = bot.List(group, member.name)
                     if membs:
                         bot.GroupShut(group, membs, min*60)
+            elif command.startswith("refresh"):
+                re=diff_group_bps()
+                if len(re)==0:
+                    bot.SendTo(contact, "无任何bp1更新")
+                else:
+                    for r in re:
+                        bot.SendTo(contact, r)
+            elif command.startswith("su"):
+                if member.qq=='237515611':
+                    subcommand=content[4:]
+                    if subcommand.startswith("refresh"):
+                        refresh_group_bp()
+                        bot.SendTo(contact, "强制刷新bp完成")
+                else:
+                    bot.SendTo(contact, "你不是权限狗，不能使用该命令")
 
