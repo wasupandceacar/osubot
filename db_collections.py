@@ -29,27 +29,32 @@ def get_group_uids():
         traceback.print_exc()
 
 def get_one_bp(uid):
-    name = get_username(uid)
-    for i in range(4):
-        userurl = 'https://osu.ppy.sh/pages/include/profile-leader.php?u=' + str(uid) + '&m='+str(i)
-        data = s.get(userurl).content
-        info = data.decode('utf-8')
-        pplist = re.compile('<b>(.*?)pp</b>')
-        pps = re.findall(pplist, info)
-        if len(pps)==0:
-            pp='0'
-            map=''
-        else:
-            pp=pps[0]
-            maplist = re.compile('href="/b/.*?>(.*?)<div class="c">', re.S)
-            map = re.findall(maplist, info)[0]
-            map = map[:-8]
-            map = map.replace('</a>', '')
-            map = map.replace('</b>', '')
-            map = map.replace('&#039;', '\'')
-            map = map.replace('&amp;', '&')
-            map = map.replace('&quot;', '"')
-        bp_dic[i][uid]=[name, pp, map]
+    try:
+        name = get_username(uid)
+        for i in range(4):
+            userurl = 'https://osu.ppy.sh/pages/include/profile-leader.php?u=' + str(uid) + '&m=' + str(i)
+            data = s.get(userurl).content
+            info = data.decode('utf-8')
+            pplist = re.compile('<b>(.*?)pp</b>')
+            pps = re.findall(pplist, info)
+            if len(pps) == 0:
+                pp = '0'
+                map = ''
+            else:
+                pp = pps[0]
+                maplist = re.compile('href="/b/.*?>(.*?)<div class="c">', re.S)
+                map = re.findall(maplist, info)[0]
+                map = map[:-8]
+                map = map.replace('</a>', '')
+                map = map.replace('</b>', '')
+                map = map.replace('&#039;', '\'')
+                map = map.replace('&amp;', '&')
+                map = map.replace('&quot;', '"')
+            bp_dic[i][uid] = [name, pp, map]
+    except:
+        traceback.print_exc()
+        get_one_bp(uid)
+
 
 def get_username(uid):
     userurl = 'https://osu.ppy.sh/u/' + str(uid)
@@ -129,7 +134,7 @@ def get_one_pp(uid):
             pp_dic[i][uid] = [name, '-1' if jdata[0]['pp_raw'] == None else jdata[0]['pp_raw']]
     except:
         traceback.print_exc()
-        get_one_bp(uid)
+        get_one_pp(uid)
 
 def refresh_group_pps():
     for uid in get_group_uids():
