@@ -3,6 +3,7 @@ import traceback
 import requests
 import re
 import json
+from settings import *
 
 s = requests.Session()
 
@@ -15,7 +16,7 @@ mod=['std', 'taiko', 'ctb', 'mania']
 def get_group_uids():
     re=[]
     try:
-        db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+        db = pymysql.connect(DB_IP, DB_USER, DB_PSWD, "osu")
         cursor = db.cursor()
         sql = "SELECT * FROM group_id"
         cursor.execute(sql)
@@ -65,7 +66,7 @@ def refresh_group_bps():
     for uid in get_group_uids():
         get_one_bp(uid)
     try:
-        db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+        db = pymysql.connect(DB_IP, DB_USER, DB_PSWD, "osu")
         cursor = db.cursor()
         sql = 'INSERT INTO group_bps (uid, username, bpname, bppp, mode) VALUES (%s, %s, %s ,%s, %s) on duplicate key update username=values(username), bpname=values(bpname), bppp=values(bppp)'
         list=[]
@@ -82,7 +83,7 @@ def refresh_group_bps():
 def get_group_bps():
     re_bp_dic = [{}, {}, {}, {}]
     try:
-        db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+        db = pymysql.connect(DB_IP, DB_USER, DB_PSWD, "osu")
         cursor = db.cursor()
         sql = "SELECT * FROM group_bps"
         cursor.execute(sql)
@@ -106,7 +107,7 @@ def diff_group_bps():
             if old_dic[k]!=v:
                 try:
                     re.append("("+mod[i]+") "+v[0]+" 刷新了bp1\n"+v[2]+" "+v[1]+"pp")
-                    db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+                    db = pymysql.connect(DB_IP, DB_USER, DB_PSWD, "osu")
                     cursor = db.cursor()
                     sql = """UPDATE group_bps SET username="%s", bpname="%s", bppp="%d" where uid="%d" and mode="%d" """ % (v[0], v[2], int(v[1]), k, i)
                     cursor.execute(sql)
@@ -120,7 +121,7 @@ def get_one_pp(uid):
     try:
         name = get_username(uid)
         for i in range(4):
-            ppurl = "https://osu.ppy.sh/api/get_user?k=cff10afa31a4a9cd85aa7bc433c20c862562ed51&u=" + str(
+            ppurl = "https://osu.ppy.sh/api/get_user?k="+OSU_API_KEY+"&u=" + str(
                 uid) + "&m=" + str(i)
             data = s.get(ppurl).content
             ddata = data.decode('utf-8')
@@ -134,7 +135,7 @@ def refresh_group_pps():
     for uid in get_group_uids():
         get_one_pp(uid)
     try:
-        db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+        db = pymysql.connect(DB_IP, DB_USER, DB_PSWD, "osu")
         cursor = db.cursor()
         sql = 'INSERT INTO group_pps (uid, username, pp, mode) VALUES (%s, %s, %s ,%s) on duplicate key update username=values(username), pp=values(pp)'
         list=[]
@@ -151,7 +152,7 @@ def refresh_group_pps():
 def get_group_pps():
     re_pp_dic = [{}, {}, {}, {}]
     try:
-        db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+        db = pymysql.connect(DB_IP, DB_USER, DB_PSWD, "osu")
         cursor = db.cursor()
         sql = "SELECT * FROM group_pps"
         cursor.execute(sql)
@@ -177,7 +178,7 @@ def diff_group_pps():
                 if delta>1.0:
                     re.append("(" + mod[i] + ") " + v[0] + " +" + str(round(delta, 2)) + "pp\nfrom " + str(old_dic[k][1]) + "pp to " + str(v[1]) + "pp")
                 try:
-                    db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+                    db = pymysql.connect(DB_IP, DB_USER, DB_PSWD, "osu")
                     cursor = db.cursor()
                     sql = """UPDATE group_pps SET username="%s", pp="%s" where uid="%d" and mode="%d" """ % (v[0], v[1], k, i)
                     cursor.execute(sql)

@@ -2,6 +2,7 @@ import requests
 import json
 import threading
 from db_collections import get_group_uids
+from settings import *
 
 s = requests.Session()
 
@@ -23,7 +24,7 @@ def get_rank(mod):
     return rankstr
 
 def get_one_rank(uid, mod):
-    ppurl = "https://osu.ppy.sh/api/get_user?k=cff10afa31a4a9cd85aa7bc433c20c862562ed51&u=" + str(uid) + "&m="+str(mod)
+    ppurl = "https://osu.ppy.sh/api/get_user?k="+OSU_API_KEY+"&u=" + str(uid) + "&m="+str(mod)
     data = s.get(ppurl).content
     ddata = data.decode('utf-8')
     jdata = json.loads(ddata)

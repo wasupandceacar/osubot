@@ -1,12 +1,31 @@
 # 不知道想做什么的简陋osu群机器人 #
-需要的环境
+
+## 需要的环境 ##
 
 - python3.5（qqbot库，请自行查看qqbot使用说明）
 - mysql
 - oppai-ng
 
-另外osu-api的key请最好自行申请一个
+**另外osu-api的key请最好自行申请一个**
 
+## mysql设置 ##
+
+1. 新建数据库osu
+1. 新建表group_id，字段uid(int),
+1. 新建表group_bps，字段uid(int),username(varchar),bpname(varchar),bppp(int),mode(int)
+1. 新建表group_id，字段uid(int),username(varchar),pp(int),mode(int)
+
+## setting设置 ##
+
+自行修改setting.py下的apikey,群组,数据库设置
+
+----------
+
+windows下请把osubot.py下的caculate_pp改为caculate_pp_win
+
+----------
+
+## 命令 ##
 
 !rank [0123] 查看群内各模式菜鸡排名
 

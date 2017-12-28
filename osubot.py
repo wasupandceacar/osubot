@@ -3,6 +3,7 @@ from caculate_pp import *
 from db_collections import *
 import random
 from qqbot import qqbotsched
+from settings import *
 
 help_message="!rank [0123] 查看群内各模式菜鸡排名\n" \
              "!capp 查询单图pp\n" \
@@ -20,7 +21,7 @@ def check_bp_task(bot):
         print("无bp1更新")
     else:
         for r in re:
-            gl = bot.List('group', '200064826')
+            gl = bot.List('group', OSU_GROUP)
             if gl is not None:
                 for group in gl:
                     bot.SendTo(group, r)
@@ -29,7 +30,7 @@ def check_bp_task(bot):
         print("无pp大更新")
     else:
         for r in re:
-            gl = bot.List('group', '200064826')
+            gl = bot.List('group', OSU_GROUP)
             if gl is not None:
                 for group in gl:
                     bot.SendTo(group, r)
@@ -40,7 +41,7 @@ def onStartupComplete(bot):
     print("初始强制刷新完成")
 
 def onQQMessage(bot, contact, member, content):
-    if contact.ctype=='group' and (contact.qq=='203341856' or contact.qq=='200064826'):
+    if contact.ctype=='group' and (contact.qq==OSU_GROUP or contact.qq==TEST_GROUP):
         if not bot.isMe(contact, member):
             if content.startswith('!'):
                 command = content[1:]
@@ -95,7 +96,7 @@ def onQQMessage(bot, contact, member, content):
                         for r in re:
                             bot.SendTo(contact, r)
                 elif command.startswith("su"):
-                    if member.qq == '237515611':
+                    if member.qq in ADMIN_QQ:
                         subcommand = content[4:]
                         if subcommand.startswith("refreshbp"):
                             refresh_group_bps()
