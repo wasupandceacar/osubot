@@ -2,11 +2,13 @@ import pymysql
 import traceback
 import requests
 import re
-import threading
+import json
 
 s = requests.Session()
 
 bp_dic=[{},{},{},{}]
+
+pp_dic=[{},{},{},{}]
 
 mod=['std', 'taiko', 'ctb', 'mania']
 
@@ -59,7 +61,7 @@ def get_username(uid):
         print(str(uid)+" crashed")
         return get_username(uid)
 
-def refresh_group_bp():
+def refresh_group_bps():
     for uid in get_group_uids():
         get_one_bp(uid)
     try:
@@ -114,5 +116,76 @@ def diff_group_bps():
                     traceback.print_exc()
     return re
 
+def get_one_pp(uid):
+    try:
+        name = get_username(uid)
+        for i in range(4):
+            ppurl = "https://osu.ppy.sh/api/get_user?k=cff10afa31a4a9cd85aa7bc433c20c862562ed51&u=" + str(
+                uid) + "&m=" + str(i)
+            data = s.get(ppurl).content
+            ddata = data.decode('utf-8')
+            jdata = json.loads(ddata)
+            pp_dic[i][uid] = [name, '-1' if jdata[0]['pp_raw'] == None else jdata[0]['pp_raw']]
+    except:
+        traceback.print_exc()
+        get_one_bp(uid)
+
+def refresh_group_pps():
+    for uid in get_group_uids():
+        get_one_pp(uid)
+    try:
+        db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+        cursor = db.cursor()
+        sql = 'INSERT INTO group_pps (uid, username, pp, mode) VALUES (%s, %s, %s ,%s) on duplicate key update username=values(username), pp=values(pp)'
+        list=[]
+        for i in range(len(bp_dic)):
+            dic=pp_dic[i]
+            for (k, v) in dic.items():
+                 list.append((k, v[0], float(v[1]), i))
+        cursor.executemany(sql, list)
+        db.commit()
+        db.close()
+    except:
+        traceback.print_exc()
+
+def get_group_pps():
+    re_pp_dic = [{}, {}, {}, {}]
+    try:
+        db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+        cursor = db.cursor()
+        sql = "SELECT * FROM group_pps"
+        cursor.execute(sql)
+        results = cursor.fetchall()
+        for row in results:
+            re_pp_dic[int(row[3])][int(row[0])]=[row[1], str(row[2])]
+        db.close()
+        return re_pp_dic
+    except:
+        traceback.print_exc()
+
+def diff_group_pps():
+    for uid in get_group_uids():
+        get_one_pp(uid)
+    old_pp_dic=get_group_pps()
+    re=[]
+    for i in range(len(pp_dic)):
+        dic=pp_dic[i]
+        old_dic=old_pp_dic[i]
+        for (k, v) in dic.items():
+            if old_dic[k]!=v:
+                delta=float(v[1])-float(old_dic[k][1])
+                if delta>1.0:
+                    re.append("(" + mod[i] + ") " + v[0] + " +" + str(round(delta, 2)) + "pp\nfrom " + str(old_dic[k][1]) + "pp to " + str(v[1]) + "pp")
+                try:
+                    db = pymysql.connect("138.68.57.30", "root", "1248163264128", "osu")
+                    cursor = db.cursor()
+                    sql = """UPDATE group_pps SET username="%s", pp="%s" where uid="%d" and mode="%d" """ % (v[0], v[1], k, i)
+                    cursor.execute(sql)
+                    db.commit()
+                    db.close()
+                except:
+                    traceback.print_exc()
+    return re
+
 if __name__ == "__main__":
-    print(diff_group_bps())
+    print(diff_group_pps())
