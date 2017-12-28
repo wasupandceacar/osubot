@@ -13,7 +13,7 @@
 1. 新建数据库osu
 1. 新建表group_id，字段uid(int),
 1. 新建表group_bps，字段uid(int),username(varchar),bpname(varchar),bppp(int),mode(int)
-1. 新建表group_id，字段uid(int),username(varchar),pp(int),mode(int)
+1. 新建表group_id，字段uid(int),username(varchar),pp(float),mode(int)
 
 ## setting设置 ##
 
