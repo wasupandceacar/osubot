@@ -45,8 +45,11 @@ def onQQMessage(bot, contact, member, content):
             if content.startswith('!'):
                 command = content[1:]
                 if command.startswith("rank"):
-                    mod = int(content[6:])
-                    bot.SendTo(contact, get_rank(mod))
+                    try:
+                        mod = int(content[6:])
+                        bot.SendTo(contact, get_rank(mod))
+                    except:
+                        bot.SendTo(contact, "输入正确的mod（0/1/2/3）")
                 elif command.startswith("capp"):
                     args = content[6:].split()
                     le = len(args)
@@ -67,13 +70,16 @@ def onQQMessage(bot, contact, member, content):
                 elif command.startswith("help"):
                     bot.SendTo(contact, help_message)
                 elif command.startswith("sleep"):
-                    min = int(content[7:])
-                    gl = bot.List('group', contact.name)
-                    if gl:
-                        group = gl[0]
-                        membs = bot.List(group, member.name)
-                        if membs:
-                            bot.GroupShut(group, membs, min * 60)
+                    try:
+                        min = int(content[7:])
+                        gl = bot.List('group', contact.name)
+                        if gl:
+                            group = gl[0]
+                            membs = bot.List(group, member.name)
+                            if membs:
+                                bot.GroupShut(group, membs, min * 60)
+                    except:
+                        bot.SendTo(contact, "输入正确的时间（整数，并在禁言范围内）")
                 elif command.startswith("refreshbp"):
                     re = diff_group_bps()
                     if len(re) == 0:
