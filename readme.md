@@ -29,6 +29,8 @@ windows下请把osubot.py下的caculate_pp改为caculate_pp_win
 
 !rank [0123] 查看群内各模式菜鸡排名
 
+!limit [0123] 查看群内各模式潜力表
+
 !capp 查询单图pp
 
 !roll 1-100随机roll点

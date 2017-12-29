@@ -1,4 +1,5 @@
 from group_rank import *
+from group_limit import *
 from caculate_pp import *
 from db_collections import *
 import random
@@ -6,6 +7,7 @@ from qqbot import qqbotsched
 from settings import *
 
 help_message="!rank [0123] 查看群内各模式菜鸡排名\n" \
+             "!limit [0123] 查看群内各模式潜力表\n" \
              "!capp 查询单图pp\n" \
              "!roll 1-100随机roll点\n" \
              "!sleep [n] 让bot口球你n分钟\n" \
@@ -49,6 +51,12 @@ def onQQMessage(bot, contact, member, content):
                     try:
                         mod = int(content[6:])
                         bot.SendTo(contact, get_rank(mod))
+                    except:
+                        bot.SendTo(contact, "输入正确的mod（0/1/2/3）")
+                elif command.startswith("limit"):
+                    try:
+                        mod = int(content[7:])
+                        bot.SendTo(contact, get_limit(mod))
                     except:
                         bot.SendTo(contact, "输入正确的mod（0/1/2/3）")
                 elif command.startswith("capp"):
